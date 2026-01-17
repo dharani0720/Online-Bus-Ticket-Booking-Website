@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAK TRAVELS</title>
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            background: url("{{ url_for('static', filename='bus_background1.jpeg') }}") no-repeat center center fixed;
+            background-size: cover;
+            backdrop-filter: blur(3px);
+        }
+
+        .navbar, footer {
+            background: linear-gradient(to right, #FF4500, #8B0000);
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .nav-link {
+            color: white !important;
+            margin-right: 10px;
+            border: 2px solid rgb(225, 119, 38);
+            border-radius: 20px;
+            padding: 5px 15px;
+            transition: background 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: rgb(225, 119, 38);
+        }
+
+        .navbar-clock {
+            font-size: 18px;
+            color: #FFD700;
+            font-weight: bold;
+            margin-left: 15px;
+        }
+
+        .content-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 50px 10px;
+        }
+
+        .content-box {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+            color: white;
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+            max-width: 600px;
+            margin-bottom: 30px;
+        }
+
+        .service-box {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            margin: 10px;
+        }
+
+        .service-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <a class="navbar-brand ml-3" href="{{ url_for('home') }}">Home</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Clock in Navbar -->
+        <div id="clock" class="navbar-clock d-none d-lg-block"></div>
+
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+            <ul class="navbar-nav">
+                {% if 'user_id' in session %}
+                    {% if session['role'] == 'admin' %}
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('admin') }}">Admin</a></li>
+                    {% elif session['role'] == 'passenger' %}
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('passenger') }}">Passenger</a></li>
+                    {% endif %}
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Logout</a></li>
+                {% else %}
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Login</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('register') }}">Register</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="content-container">
+        <div class="content-box">
+            <h1><b>Welcome to Online Bus Ticket Booking</b></h1>
+            <h2><b>Assured Seats of Your Choice</b></h2>
+            <p><b>Safe, fast, and reliable - Your trusted bus booking partner.</b></p>
+        </div>
+
+        <!-- Services Section -->
+        <div class="service-container">
+            <div class="service-box">
+                <h4>24/7 Customer Support</h4>
+                <p>Need help? Our support team is available round the clock.</p>
+            </div>
+            <div class="service-box">
+                <h4>Onboard Snacks & Drinks</h4>
+                <p>Enjoy complimentary snacks and drinks on select routes.</p>
+            </div>
+            <div class="service-box">
+                <h4>Luxury & Comfort</h4>
+                <p>Experience comfortable reclining seats with ample legroom.</p>
+            </div>
+            <div class="service-box">
+                <h4>Secure Payments</h4>
+                <p>Safe and hassle-free payment options available.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        &copy; maktravels bus ticket booking  | Your Comfort, Our Priority | maktravels@gmail.com 
+    </footer>
+
+    <!-- JavaScript for Clock -->
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const formattedTime = `${hours % 12 || 12}:${minutes}:${seconds} ${ampm}`;
+
+            document.getElementById('clock').innerHTML = `Time: ${formattedTime}`;
+        }
+
+        // Update the clock every second
+        setInterval(updateClock, 1000);
+        updateClock(); // Initial call to avoid delay
+    </script>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

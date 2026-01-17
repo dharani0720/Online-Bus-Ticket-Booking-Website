@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Ticket Booking</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Full height for body and HTML */
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            background: url("{{ url_for('static', filename='road.jpg') }}") no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        /* Fixed Navbar */
+        nav.navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .navbar, footer {
+            background: linear-gradient(to right, #FF4500, #8B0000);
+            color: white;
+            text-align: center;
+            padding: 5px 0;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        /* Main content area */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding-top: 80px;
+            padding-bottom: 60px;
+        }
+
+        /* Styling for search form and available buses */
+        .content-box {
+            
+            padding: 20px;
+            max-width: 800px;
+            margin: 20px auto;
+        }
+
+        .form-container {
+            text-align: center;
+        }
+
+        .list-group-item {
+            border: 1px solid black;
+            margin-bottom: 10px;
+            border-radius: 10px;
+        }
+
+        .bus-card {
+            background-color: rgba(0, 0, 0, 0.6);
+            border-radius: 30px;
+            padding: 20px;
+            color:white;
+            transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out;
+        }
+
+        .bus-card:hover {
+            background-color: rgba(255, 255, 255);
+            transform: scale(1.05);
+            color: rgb(255, 0, 47);
+        }
+        .navbar-clock {
+            font-size: 18px;
+            color: #FFD700;
+            font-weight: bold;
+            margin-left: 15px;
+        }
+
+    </style>
+</head>
+<body>
+
+
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <a class="navbar-brand" href="{{ url_for('home') }}" style="margin-left: 20px;">Home</a>
+            <!-- Clock in Navbar -->
+        <div id="clock" class="navbar-clock d-none d-lg-block"></div>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    {% if 'user_id' in session %}
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('my_bookings') }}" style="color: white; margin-right: 10px; border: 2px solid rgb(225, 119, 38); border-radius: 20px;">My Bookings</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}" style="color: white; margin-right: 10px; border: 2px solid rgb(225, 119, 38); border-radius: 20px;">Logout</a></li>
+
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}" style="color: white; margin-right: 10px; border: 2px solid rgb(225, 119, 38); border-radius: 20px;">Login</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('register') }}" style="color: white; margin-right: 10px; border: 2px solid rgb(225, 119, 38); border-radius: 20px;">Register</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    
+
+    <div class="main-content">
+        <div class="content-box form-container" style="background: rgba(0, 0, 0, 0.6);
+        border-radius: 10px;">
+            <h3 style="color: white; text-align: center;"><b>Search Buses</b></h3> 
+            <br>
+            <form action="{{url_for('passenger')}}" method="POST" class="form-inline justify-content-center">
+                <div class="form-group">
+                    <label for="source" class="mr-2" style="color: white;"><h5>Source:</h5></label>
+                    <input type="text" name="source" class="form-control mr-3" required> 
+                </div>
+                <div class="form-group">
+                    <label for="destination" class="mr-2" style="color: white;"><h5>Destination:</h5></label>
+                    <input type="text" name="destination" class="form-control mr-3" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="border-radius: 25px;">Search</button>
+            </form>
+        </div>
+
+        <div class="content-box" style="max-width: 1200px; padding: 20px;">
+            <h3 style="text-align: center; padding-bottom: 20px; color: white;"><b>Available Buses</b></h3> 
+            <div class="row"> <!-- Bootstrap Grid for Cards -->
+                {% for bus in buses %}
+                    <div class="col-md-6 mb-4"> <!-- Two cards per row -->
+                        <div class="card bus-card">
+                            <div class="card-body text-center">
+                                <h4 class="card-title">{{ bus.name }}</h4>
+                                <p class="card-text">
+                                    <strong>{{ bus.source }}</strong> → <strong>{{ bus.destination }}</strong> <br>
+                                    <strong>Date:</strong> {{ bus.date }} <br>
+                                    <strong>Price:</strong> ₹{{ bus.price }} | 
+                                    <strong>Available Seats:</strong> {{ bus.available_seats }}
+                                </p>
+                                <a href="{{ url_for('book_bus', bus_id=bus.id) }}" class="btn btn-primary">Book Now</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        
+    </div>
+
+    <footer>
+        <p style="font-size: 20px; font-family: Arial, sans-serif;">&copy; maktravels bus ticket booking  | Your Comfort, Our Priority | maktravels@gmail.com </p>
+    </footer>
+    <!-- JavaScript for Clock -->
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const formattedTime = `${hours % 12 || 12}:${minutes}:${seconds} ${ampm}`;
+
+            document.getElementById('clock').innerHTML = `Time: ${formattedTime}`;
+        }
+
+        // Update the clock every second
+        setInterval(updateClock, 1000);
+        updateClock(); // Initial call to avoid delay
+    </script>
+
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

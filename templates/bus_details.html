@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Ticket Booking</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
+    <style>
+        /* Full height for the body and HTML */
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+           
+        }
+
+        body{
+            background: url("{{ url_for('static', filename='bus_details.jpg') }}") no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        .navbar, footer {
+            background: linear-gradient(to right, #FF4500, #8B0000); /* Gradient from Orange-Red to Dark Red */
+            color: white; /* White text for contrast */
+            text-align: center;
+            padding: 5px 0;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+
+        /* Fixed Navbar */
+        nav.navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background-color: #f8f9fa;
+        }
+
+        /* Main content area */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding-top: 80px; /* Space for fixed header */
+            padding-bottom: 60px; /* Space for fixed footer */
+        }
+
+        .container{
+            max-width: 900px; /* Set max width */
+            width: 100%;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            background: rgb(0,0,0,0.6);
+            text-align: center;
+
+        }
+        
+        .table {
+            border: 2px solid #8B0000; /* Dark red border */
+            border-radius: 00px; /* Rounded corners */
+            overflow: hidden; /* Ensures rounded corners are applied */
+        }
+        .navbar-clock {
+            font-size: 18px;
+            color: #FFD700;
+            font-weight: bold;
+            margin-left: 15px;
+        }
+
+        .table th, .table td {
+            border: 1px solid #8B0000; /* Border for table cells */
+            padding: 10px; /* Padding for better spacing */
+            text-align: center; /* Center align text */
+        }
+
+        .table thead {
+            background-color:#f8f9fa; /* Light red background for headers */
+        }
+
+        .table tbody tr:hover {
+            background-color:rgb(147, 225, 149); /* Light grey background on hover */
+        }
+        .btn-danger {
+    padding: 5px 10px;  /* Adjust padding */
+    font-size: 14px;    /* Adjust font size */
+    height: 35px;       /* Set a specific height */
+    width: 80px;        /* Set a specific width */
+}
+
+
+
+        /* Sticky Footer */
+        /* footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color:#F44336;
+            text-align: center;
+            padding-top: 15px;
+            
+        } */
+
+    </style>
+</head>
+<body>
+
+    <!-- Display Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class="flash-messages">
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Fixed Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark "  >
+        <a class="navbar-brand" href="{{ url_for('home') }}" style="margin-left: 20px;">Home</a>
+        <!-- Clock in Navbar -->
+        <div id="clock" class="navbar-clock d-none d-lg-block"></div>
+        
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                {% if 'user_id' in session %}
+                    <li class="nav-item"><a class="nav-link" href="{{url_for('admin')}}" style="color: white;margin-right: 10px;border: 2px solid rgb(225, 119, 38);border-radius: 20px;">Admin</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{url_for('view_bookings')}}" style="color: white;margin-right: 10px;border: 2px solid rgb(225, 119, 38);border-radius: 20px;">View Bookings</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{url_for('logout')}}" style="color: white;margin-right: 10px;border: 2px solid rgb(225, 119, 38);border-radius: 20px;">Logout</a></li>
+                {% else %}
+                    <li class="nav-item"><a class="nav-link" href="{{url_for('login')}}" style="color: white;margin-right: 10px;border: 2px solid rgb(225, 119, 38);border-radius: 20px;">Login</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{url_for('register')}}" style="color: white;margin-right: 10px;border: 2px solid rgb(225, 119, 38);border-radius: 20px;">Register</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+        <div class="container mt-5" >
+
+            
+            
+            <!-- Bus Details Table -->
+            <h3 style="color: white;"> <b>Bus Details</b></h3> <br>
+            <table class="table table-bordered" >
+                <thead >
+                    <tr >
+                        <th style="padding-bottom: 20px; color:black;"><b>Name</b></th>
+                        <th style="padding-bottom: 20px; color:black;"><b>Source</b></th>
+                        <th style="padding-bottom: 20px; color:black;"><b>Destination</b></th>
+                        <th style="padding-bottom: 20px; color:black;"><b>Date</b></th>
+                        <th style="color:black;"> <b>Price per Seat</b></th>
+                        <th style="color:black;"><b>Total Seats</b></th>
+                        <th style="color:green;"><b>Available Seats</b></th>
+                        <th style="padding-bottom: 20px; color:black;" ><b>Delete</b></th>
+                        <th style="padding-bottom: 20px; color:black;"><b>Edit</b></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for bus in buses %}
+                        <tr>
+                            <td style="color:white;">{{ bus.name }}</td>
+                            <td style="color:white;">{{ bus.source }}</td>
+                            <td style="color:white;">{{ bus.destination }}</td>
+                            <td style="color:white;">{{ bus.date }}</td>
+                            <td style="color:white;">₹{{ bus.price }}</td>
+                            <td style="color:white;">{{ bus.total_seats }}</td>
+                            <td style="color:white;">{{ bus.available_seats }}</td>
+                            <td>
+                                <form action="{{ url_for('delete_bus', bus_id=bus.id) }}" method="POST">
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </form>
+                            </td>
+                                <td>
+                                    <a href="{{ url_for('edit_bus', bus_id=bus.id) }}" class="btn btn-warning">Edit</a>
+                                </td>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <br><br>
+    </div>
+
+    <!-- Fixed Footer -->
+    <footer>
+        <p style="font-size: 20px;">&copy; maktravels bus ticket booking  | Your Comfort, Our Priority | maktravels@gmail.com </p>
+
+    </footer>
+    <!-- JavaScript for Clock -->
+<script>
+    function updateClock() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        const formattedTime = `${hours % 12 || 12}:${minutes}:${seconds} ${ampm}`;
+
+        document.getElementById('clock').innerHTML = `Time: ${formattedTime}`;
+    }
+
+    // Update the clock every second
+    setInterval(updateClock, 1000);
+    updateClock(); // Initial call to avoid delay
+</script>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>

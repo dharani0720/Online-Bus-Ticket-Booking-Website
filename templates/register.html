@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Ticket Booking</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    
+    <style>
+        /* Full-height layout with flexbox */
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+           
+        }
+
+        body{
+            background: url("{{ url_for('static', filename='bus_background1.jpeg') }}") no-repeat center center fixed;
+            backdrop-filter: blur(2px);
+            background-size: cover;
+        }
+
+        .navbar, footer {
+            background: linear-gradient(to right, #FF4500, #8B0000); /* Gradient from Orange-Red to Dark Red */
+            color: white; /* White text for contrast */
+            text-align: center;
+            padding: 5px 0;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        /* Center content vertically and horizontally */
+        .content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        /* Content box styling */
+        .content-box {
+            background: rgba(0, 0, 0, 0.6); /* Slight transparency */
+            padding: 30px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 500px; /* Set a maximum width for the box */
+        }
+
+        /* Footer at the bottom */
+        /* footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color:#F44336;
+            text-align: center;
+            padding-top: 15px; 
+        } */
+
+
+        /* Flash message container styles */
+            ul.flash-messages {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+                position: fixed;
+                top: 20px; /* Adjust the position of the message */
+                left: 50%;
+                transform: translateX(-50%);
+                z-index: 1050; /* Ensure it's above other content */
+                max-width: 400px; /* Set a max-width */
+                width: 100%;
+            }
+
+            /* General flash message style */
+            ul.flash-messages li {
+                padding: 15px;
+                margin-bottom: 10px;
+                border-radius: 5px;
+                font-size: 16px;
+                text-align: center;
+                opacity: 1;
+                animation: fadeOut 3s forwards;
+            }
+            .navbar-clock {
+                font-size: 18px;
+                color: #FFD700;
+                font-weight: bold;
+                margin-left: 15px;
+            }
+
+            /* Success message style */
+            ul.flash-messages li.success {
+                background-color: #d4edda;
+                color: #155724;
+                border: 1px solid #c3e6cb;
+            }
+
+            /* Error message style */
+            ul.flash-messages li.danger {
+                background-color: #f8d7da;
+                color: red;
+                border: 1px solid #f5c6cb;
+            }
+
+            /* Fade-out animation */
+            @keyframes fadeOut {
+                0% {
+                    opacity: 1;
+                }
+                80% {
+                    opacity: 1;
+                }
+                100% {
+                    opacity: 0;
+                }
+            }
+
+
+    </style>
+</head>
+<body>
+
+    <!-- Display Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class="flash-messages">
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+    
+    <nav class="navbar navbar-expand-lg navbar-dark " >
+        <a class="navbar-brand" href="{{ url_for('home') }}"style="margin-left: 20px;">Home</a>
+        <!-- Clock in Navbar -->
+        <div id="clock" class="navbar-clock d-none d-lg-block"></div>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                {% if 'user_id' in session %}
+                    <li class="nav-item"><a class="nav-link" href="{{url_for('my_bookings')}}" style="color: white;margin-right: 10px;border: 2px solid rgb(225, 119, 38);border-radius: 20px;">My Bookings</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{url_for('logout')}}" style="color: white;margin-right: 10px;border: 2px solid rgb(225, 119, 38);border-radius: 20px;">Logout</a></li>
+                {% else %}
+                    <li class="nav-item"></li><a class="nav-link" href="{{url_for('login')}}" style="color: white;margin-right: 10px;border: 2px solid rgb(225, 119, 38);border-radius: 20px;">Login</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{url_for('register')}}" style="color: white;margin-right: 10px;border: 2px solid rgb(225, 119, 38);border-radius: 20px;">Register</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container content" style="padding-bottom: 60px;">
+        <div class="content-box"  style="">
+            
+            <h2 style="color: white;"><b>Register</b></h2><br>
+            <form action="{{url_for('register')}}" method="POST">
+                <div class="form-group">
+                    <label for="username" style="color: white;"><b>Username:</b></label>
+                    <input type="text" name="username" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="password" style="color: white;"><b>Password:</b></label>
+                    <input type="password" name="password" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="role" style="color: white;"><b>Role:</b></label>
+                    <select name="role" class="form-control">
+                        <option value="passenger">Passenger</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block" style="width: 100px;margin-left: 170px;border-radius: 25px;"><b>Register</b></button>
+            </form>
+            <p class="mt-3" style="color: white;"><b>Already have an account? </b><a href="{{url_for('login')}}" style="color: rgb(137, 0, 149);text-decoration: none;"><b>Login</b></a></p>
+        </div>
+    </div>
+
+    <footer>
+        <p style="font-size: 20px;">&copy;  maktravels bus ticket booking  | Your Comfort, Our Priority | maktravels@gmail.com </p>
+
+    </footer>
+<!-- JavaScript for Clock -->
+ <script>
+    function updateClock() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        const formattedTime = `${hours % 12 || 12}:${minutes}:${seconds} ${ampm}`;
+
+        document.getElementById('clock').innerHTML = `Time: ${formattedTime}`;
+    }
+
+    // Update the clock every second
+    setInterval(updateClock, 1000);
+    updateClock(); // Initial call to avoid delay
+</script> 
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

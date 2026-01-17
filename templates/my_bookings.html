@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Ticket Booking</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{url_for('static',filename='style.css')}}">
+    <style>
+        /* Make the html and body elements fill the full height */
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body{
+            background: url("{{ url_for('static', filename='seats.jpg') }}") no-repeat center center fixed;
+            backdrop-filter:  blur(2px) background: rgba(0, 0, 0, 0.6);
+            background-size: cover;
+            color: black;
+        }
+
+        .navbar, footer {
+            background: linear-gradient(to right, #FF4500, #8B0000); /* Gradient from Orange-Red to Dark Red */
+            color: white; /* White text for contrast */
+            text-align: center;
+            padding: 5px 0;
+            font-size: 20px;
+            font-weight: bold;
+            position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                z-index: 1000;
+        }
+
+        /* Fixed navbar */
+        
+
+        /* Ensure that the main content area is scrollable */
+        .content {
+            flex: 1;
+            padding-top: 80px 20px 60px; /* Space for fixed navbar */
+             /* Space for fixed footer */
+            overflow-y: auto;
+            height: calc(100vh - 140px); /* Adjust the height to account for header and footer */
+        }
+
+        /* Fixed footer */
+        /* footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color:#F44336;
+            text-align: center;
+            padding-top: 15px;
+            
+        } */
+
+        footer {
+                background: linear-gradient(to right, #FF4500, #8B0000);
+                color: white;
+                text-align: center;
+                padding: 5px 0;
+                width: 100%;
+                position: relative;
+                bottom: 0;
+                left: 0;
+                 /* Ensures footer stays at bottom without causing a scrollbar */
+        }
+
+        .status-badge {
+                display: inline-block;
+                padding: 6px 12px;
+                font-size: 14px;
+                font-weight: bold;
+                border-radius: 5px;
+                color: white;
+            }
+            .navbar-clock {
+                font-size: 18px;
+                color: #FFD700;
+                font-weight: bold;
+                margin-left: 15px;
+            }
+
+            .booked {
+                background-color: darkgreen;
+            }
+
+            .cancelled {
+                background-color: darkred;
+            }
+
+
+
+    </style>
+</head>
+<body>
+
+    <!-- Display Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class="flash-messages">
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Fixed Navbar -->
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark " >
+            <a class="navbar-brand" href="{{ url_for('home') }}"  style="margin-left: 20px;" >Home</a>
+            <!-- Clock in Navbar -->
+        <div id="clock" class="navbar-clock d-none d-lg-block"></div>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    {% if 'user_id' in session %}
+                        {% if session['role'] == 'admin' %}
+                            <li class="nav-item"><a class="nav-link" href="{{url_for('admin')}}" style="color: white;margin-right: 10px;border: 2px solid rgb(225, 119, 38);border-radius: 20px;">Admin</a></li>
+                        {% elif session['role'] == 'passenger' %}
+                            <li class="nav-item"><a class="nav-link" href="{{url_for('passenger')}}" style="color: white;margin-right: 10px;border: 2px solid rgb(225, 119, 38);border-radius: 20px;">Passenger</a></li>
+                        {% endif %}
+                        <li class="nav-item"><a class="nav-link" href="{{url_for('logout')}}" style="color: white;margin-right: 10px;border: 2px solid rgb(225, 119, 38);border-radius: 20px;">Logout</a></li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{{url_for('login')}}" style="color: white;margin-right: 10px;border: 2px solid rgb(225, 119, 38);border-radius: 20px;">Login</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{url_for('register')}}" style="color: white;margin-right: 10px;border: 2px solid rgb(225, 119, 38);border-radius: 20px;">Register</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content Area (scrollable) -->
+    <div class="content" style="margin-top: 70px;">
+        <div class="container mt-5" style="background: rgba(0,0,0,0.6);margin-top: 50px;margin-bottom: 150px;max-width: 500px;">
+            
+
+            <h2 style="color: white;">My Bookings</h2><br>
+
+            {% for booking in bookings %}
+    <div class="card mb-3" style="margin: 20px;">
+        <div class="card-body" style="border: 1px solid teal;">
+            <h2 class="card-title" style="color: darkmagenta;">{{ booking.name }}</h2>
+            <h3 class="card-text">{{ booking.source }} - {{ booking.destination }}</h3>
+            <p class="card-text">{{ booking.date }} | Price per Seat: ₹{{ booking.price }} | Seats: {{ booking.seats_booked }}</p>
+            <p class="card-text">Total Price: ₹{{ booking.total_price }}</p>
+
+            <!-- Status with Conditional Coloring -->
+            <p class="card-text">
+                
+                <span class="status-badge 
+                    {% if booking.status == 'Booked' %} booked 
+                    {% elif booking.status == 'Cancelled' %} cancelled 
+                    {% endif %}">
+                    {{ booking.status }}
+                </span>
+            </p>
+
+            <!-- Show Cancel Button Only if Status is "Booked" -->
+                {% if booking.status == "Booked" %}
+                    <form action="{{ url_for('cancel_booking', booking_id=booking.id) }}" method="POST">
+                            <button type="submit" class="btn btn-danger">Cancel Booking</button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+                {% endfor %}
+
+
+        </div>
+    </div>
+
+    <!-- Fixed Footer -->
+    <footer>
+        <p style="font-size: 20px;">&copy; maktravels bus ticket booking  | Your Comfort, Our Priority | maktravels@gmail.com </p>
+
+    </footer>
+    <!-- JavaScript for Clock -->
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const formattedTime = `${hours % 12 || 12}:${minutes}:${seconds} ${ampm}`;
+
+            document.getElementById('clock').innerHTML = `Time: ${formattedTime}`;
+        }
+
+        // Update the clock every second
+        setInterval(updateClock, 1000);
+        updateClock(); // Initial call to avoid delay
+    </script>
+
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

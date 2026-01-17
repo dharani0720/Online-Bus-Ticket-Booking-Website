@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Bus</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background: url("{{ url_for('static', filename='bus_details.jpg') }}") no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 50px;
+            box-shadow: 0px 0px 15px rgba(255, 69, 0, 0.8);
+        }
+        h2 {
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+        }
+        .btn-primary {
+            background-color: #FF4500;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Edit Bus Details</h2>
+        <form action="{{ url_for('edit_bus', bus_id=bus.id) }}" method="POST">
+            <div class="form-group">
+                <label for="name">Bus Name:</label>
+                <input type="text" class="form-control" id="name" name="name" value="{{ bus.name }}" required>
+            </div>
+            <div class="form-group">
+                <label for="source">Source:</label>
+                <input type="text" class="form-control" id="source" name="source" value="{{ bus.source }}" required>
+            </div>
+            <div class="form-group">
+                <label for="destination">Destination:</label>
+                <input type="text" class="form-control" id="destination" name="destination" value="{{ bus.destination }}" required>
+            </div>
+            <div class="form-group">
+                <label for="date">Date:</label>
+                <input type="date" class="form-control" id="date" name="date" value="{{ bus.date }}" required>
+            </div>
+            <div class="form-group">
+                <label for="price">Price (₹):</label>
+                <input type="number" class="form-control" id="price" name="price" value="{{ bus.price }}" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label for="total_seats">Total Seats:</label>
+                <input type="number" class="form-control" id="total_seats" name="total_seats" value="{{ bus.total_seats }}" required>
+            </div>
+            <div class="form-group">
+                <label for="available_seats">Available Seats:</label>
+                <input type="number" class="form-control" id="available_seats" name="available_seats" value="{{ bus.available_seats }}" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Update Bus</button>
+        </form>
+        <br>
+        <a href="{{ url_for('bus_details') }}" class="btn btn-secondary btn-block">Back to Bus Details</a>
+    </div>
+</body>
+</html>

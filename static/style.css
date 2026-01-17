@@ -1,0 +1,170 @@
+/* General Styling */
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #000000, #222222); /* Midnight Black Gradient */
+    color: white;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+/* Container */
+.container {
+    width: 50%;
+    margin: 30px auto;
+    background: rgba(255, 255, 255, 0.1); /* Glass effect */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Forms */
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+input, select {
+    width: 80%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 16px;
+}
+
+input:focus, select:focus {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid #ffcc00;
+}
+
+/* Button Styling */
+button {
+    background: #ffcc00;
+    color: black;
+    font-weight: bold;
+    border: none;
+    padding: 12px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 80%;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #e6b800;
+    transform: scale(1.05);
+}
+
+/* Links */
+a {
+    text-decoration: none;
+    color: #ffcc00;
+    font-weight: bold;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Flash Messages */
+ul.flash-messages {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1050;
+    max-width: 400px;
+    width: 100%;
+}
+
+ul.flash-messages li {
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    font-size: 16px;
+    text-align: center;
+    opacity: 1;
+    animation: fadeOut 3s forwards;
+}
+
+/* Success Message */
+ul.flash-messages li.success {
+    background-color: #28a745;
+    color: white;
+    border: 1px solid #218838;
+}
+
+/* Error Message */
+ul.flash-messages li.danger {
+    background-color: #f8d7da;
+    color: red;
+    border: 1px solid #f5c6cb;
+}
+
+/* Bus Listings */
+.bus-list {
+    list-style: none;
+    padding: 0;
+}
+
+.bus-list li {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0px 2px 10px rgba(255, 255, 255, 0.1);
+    margin: 10px 0;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Content Box (Glassmorphism Effect) */
+.content-box {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.1);
+    color: white;
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    animation: fadeIn 1s ease-out forwards;
+}
+
+.service-box {
+    background: rgba(0, 0, 0, 0.6);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    margin: 10px;
+    animation: fadeIn 1s ease-out forwards;
+}
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}

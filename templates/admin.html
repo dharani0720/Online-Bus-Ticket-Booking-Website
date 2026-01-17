@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Ticket Booking</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* Full-height layout with flexbox */
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            
+        }
+
+        body{
+            background: url("{{ url_for('static', filename='admin_page.jpg') }}") no-repeat center center fixed;
+            
+            background-size: cover;
+        }
+
+        .navbar, footer {
+            background: linear-gradient(to right, #FF4500, #8B0000); /* Gradient from Orange-Red to Dark Red */
+            color: white; /* White text for contrast */
+            text-align: center;
+            padding: 5px 0;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        /* Sticky header */
+        nav.navbar {
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+
+        /* Main content area, making it scrollable */
+        .main-content {
+            flex: 1;
+            overflow-y: auto; /* Allows vertical scrolling */
+            margin-top: 80px; /* Offset for the fixed navbar */
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        /* Content box with smaller size */
+        .content-box {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 20px;  /* Reduced padding */
+            border-radius: 10px;
+            width: 100%;
+            max-width: 600px; /* Set a smaller maximum width */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 1); /* Optional shadow effect */
+            margin: 0 auto;
+        }
+        .navbar-clock {
+            font-size: 18px;
+            color: #FFD700;
+            font-weight: bold;
+            margin-left: 15px;
+        }
+
+        /* Fixed footer */
+        /* footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color:#F44336;
+            text-align: center;
+            padding-top: 15px;
+            
+        } */
+
+        /* Form input controls */
+        .form-control {
+            width: 400px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Display Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class="flash-messages">
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Sticky Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark "  >
+       <a class="navbar-brand" href="{{ url_for('home') }}"style="margin-left: 20px;" >Home</a>
+       <!-- Clock in Navbar -->
+       <div id="clock" class="navbar-clock d-none d-lg-block"></div>
+        
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                {% if 'user_id' in session %}
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('bus_details') }}" style="color: white;margin-right: 10px;border: 2px solid rgb(225, 119, 38);border-radius: 20px;">Bus Details</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('view_bookings') }}" style="color: white;margin-right: 10px;border: 2px solid rgb(225, 119, 38);border-radius: 20px;">View Bookings</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}" style="color: white;margin-right: 10px;border: 2px solid rgb(225, 119, 38);border-radius: 20px;">Logout</a></li>
+                
+                {% else %}
+                     <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}" style="color: white;margin-right: 10px;border: 2px solid rgb(225, 119, 38);border-radius: 20px;">Login</a></li> 
+                     <li class="nav-item"><a class="nav-link" href="{{ url_for('register') }}" style="color: white;margin-right: 10px;border: 2px solid rgb(225, 119, 38);border-radius: 20px;">Register</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <div class="main-content" >
+        <div class="content-box" style="" >
+            <h3 style="color: white;"><b>Admin Dashboard</b></h3> <br>
+            <form action="{{ url_for('admin') }}" method="POST">
+                <div class="form-group">
+                    <label for="name" style="color: white;"><b>Name:</b> </label>
+                    <input type="text" name="name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="source" style="color: white;"><b>Source:</b> </label>
+                    <input type="text" name="source" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="destination" style="color: white;"><b>Destination: </b></label>
+                    <input type="text" name="destination" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="date" style="color: white;"><b>Date:</b> </label>
+                    <input type="date" name="date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="price" style="color: white;"><b>Price:</b> </label>
+                    <input type="text" name="price" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="total_seats" style="color: white;"><b>Total Seats:</b> </label>
+                    <input type="number" name="total_seats" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="color: rgb(255, 255, 255);border-radius: 25px;"><b>Add Bus</b></button> 
+            </form>
+        </div>
+    <br><br>
+
+    </div>
+    <!-- Fixed Footer -->
+    <footer>
+        <p style="font-size: 20px;">&copy; maktravels bus ticket booking  | Your Comfort, Our Priority | maktravels@gmail.com </p>
+
+    </footer>
+<!-- JavaScript for Clock -->
+<script>
+    function updateClock() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        const formattedTime = `${hours % 12 || 12}:${minutes}:${seconds} ${ampm}`;
+
+        document.getElementById('clock').innerHTML = `Time: ${formattedTime}`;
+    }
+
+    // Update the clock every second
+    setInterval(updateClock, 1000);
+    updateClock(); // Initial call to avoid delay
+</script>
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>
